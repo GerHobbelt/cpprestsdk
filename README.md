@@ -1,3 +1,10 @@
+***
+**XVELA NOTES: MAC BUILD**
+This fork fixes five compile errors in the original source code when you perform the `make -j 4` step.
+These all are due to calls to `std::move`. Commenting out the move call seems to solve the problem.
+You may also need to run `brew link openssl --force` but I do not recall what prompted me to do that.
+***
+
 ## Welcome!
 
 The C++ REST SDK is a Microsoft project for cloud-based client-server communication in native code using a modern asynchronous C++ API design. This project aims to help C++ developers connect to and interact with services.  
