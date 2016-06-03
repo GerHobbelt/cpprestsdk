@@ -64,3 +64,4 @@ Intermediate/
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
 
+build.debug
