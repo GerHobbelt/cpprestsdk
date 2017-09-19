@@ -65,3 +65,9 @@ Intermediate/
 !**/packages/build/
 
 build.debug
+Release/samples/CasaLens/CasaLens120/js/default.js
+Release/samples/CasaLens/CasaLens120/image/bing-logo.jpg
+Release/samples/CasaLens/CasaLens120/css/default.css
+Release/samples/CasaLens/CasaLens120/image/wall.jpg
+Release/samples/CasaLens/CasaLens120/AppCode.html
+Release/samples/CasaLens/CasaLens120/image/logo.png
