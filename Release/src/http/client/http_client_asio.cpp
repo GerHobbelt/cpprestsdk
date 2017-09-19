@@ -97,8 +97,11 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_socket_lock);
         assert(!is_ssl());
-        boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23);
-        ssl_context.set_default_verify_paths();
+/* TO DO
+//         boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23);
+*/
+		boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tlsv12_client);
+		ssl_context.set_default_verify_paths();
         ssl_context.set_options(boost::asio::ssl::context::default_workarounds);
         m_ssl_context_callback(ssl_context);
         m_ssl_stream = utility::details::make_unique<boost::asio::ssl::stream<boost::asio::ip::tcp::socket &>>(m_socket, ssl_context);
