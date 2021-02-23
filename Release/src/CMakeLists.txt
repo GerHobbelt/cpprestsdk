@@ -66,8 +66,7 @@ elseif(CPPREST_WEBSOCKETS_IMPL STREQUAL "wspp")
     websockets/client/ws_client_wspp.cpp
   )
 
-  target_link_libraries(cpprest PRIVATE ${cpprestsdk_websocketpp_internal})
-  target_link_libraries(cpprest PUBLIC ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal})
+  target_link_libraries(cpprest PRIVATE ${cpprestsdk_websocketpp_internal} ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal})
 else()
   message(FATAL_ERROR "Invalid implementation")
 endif()
