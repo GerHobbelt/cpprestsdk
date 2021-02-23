@@ -39,7 +39,7 @@ set(SOURCES
   utilities/web_utilities.cpp
 )
 
-add_library(cpprest ${SOURCES})
+add_library(cpprest STATIC ${SOURCES})
 target_include_directories(cpprest
   PUBLIC
     $<INSTALL_INTERFACE:include> $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -65,11 +65,9 @@ elseif(CPPREST_WEBSOCKETS_IMPL STREQUAL "wspp")
     websockets/client/ws_client_impl.h
     websockets/client/ws_client_wspp.cpp
   )
-  cpprest_find_websocketpp()
-  target_link_libraries(cpprest PRIVATE cpprestsdk_websocketpp_internal)
-  cpprest_find_boost()
-  cpprest_find_openssl()
-  target_link_libraries(cpprest PUBLIC cpprestsdk_boost_internal cpprestsdk_openssl_internal)
+
+  target_link_libraries(cpprest PRIVATE ${cpprestsdk_websocketpp_internal})
+  target_link_libraries(cpprest PUBLIC ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal})
 else()
   message(FATAL_ERROR "Invalid implementation")
 endif()
@@ -81,8 +79,8 @@ if(CPPREST_EXCLUDE_COMPRESSION)
   endif()
   target_compile_definitions(cpprest PRIVATE -DCPPREST_EXCLUDE_COMPRESSION=1)
 else()
-  cpprest_find_zlib()
-  target_link_libraries(cpprest PRIVATE cpprestsdk_zlib_internal)
+
+  target_link_libraries(cpprest PRIVATE ${cpprestsdk_zlib_internal})
   if(CPPREST_EXCLUDE_BROTLI)
     target_compile_definitions(cpprest PRIVATE -DCPPREST_EXCLUDE_BROTLI=1)
   else()
@@ -126,18 +124,16 @@ endif()
 
 # Http client component
 if(CPPREST_HTTP_CLIENT_IMPL STREQUAL "asio")
-  cpprest_find_boost()
-  cpprest_find_openssl()
+
   target_compile_definitions(cpprest PUBLIC -DCPPREST_FORCE_HTTP_CLIENT_ASIO)
   target_sources(cpprest PRIVATE http/client/http_client_asio.cpp http/client/x509_cert_utilities.cpp)
-  target_link_libraries(cpprest PUBLIC cpprestsdk_boost_internal cpprestsdk_openssl_internal)
+  target_link_libraries(cpprest PUBLIC ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal})
 elseif(CPPREST_HTTP_CLIENT_IMPL STREQUAL "winhttppal")
-  cpprest_find_boost()
-  cpprest_find_openssl()
+
   cpprest_find_winhttppal()
   target_compile_definitions(cpprest PUBLIC -DCPPREST_FORCE_HTTP_CLIENT_WINHTTPPAL)
   target_sources(cpprest PRIVATE http/client/http_client_winhttp.cpp http/client/x509_cert_utilities.cpp)
-  target_link_libraries(cpprest PUBLIC cpprestsdk_boost_internal cpprestsdk_openssl_internal cpprestsdk_winhttppal_internal)
+  target_link_libraries(cpprest PUBLIC ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal} cpprestsdk_winhttppal_internal)
 elseif(CPPREST_HTTP_CLIENT_IMPL STREQUAL "winhttp")
   target_link_libraries(cpprest PRIVATE
     Winhttp.lib
@@ -165,11 +161,10 @@ endif()
 
 # http listener component
 if(CPPREST_HTTP_LISTENER_IMPL STREQUAL "asio")
-  cpprest_find_boost()
-  cpprest_find_openssl()
+
   target_compile_definitions(cpprest PUBLIC -DCPPREST_FORCE_HTTP_LISTENER_ASIO)
   target_sources(cpprest PRIVATE http/listener/http_server_asio.cpp)
-  target_link_libraries(cpprest PUBLIC cpprestsdk_boost_internal cpprestsdk_openssl_internal)
+  target_link_libraries(cpprest PUBLIC ${cpprestsdk_boost_internal} ${cpprestsdk_openssl_internal})
 elseif(CPPREST_HTTP_LISTENER_IMPL STREQUAL "httpsys")
   target_sources(cpprest PRIVATE
     http/listener/http_server_httpsys.cpp
@@ -250,11 +245,11 @@ if(CPPREST_INSTALL)
 
   set(CPPREST_TARGETS cpprest)
   if(TARGET cpprestsdk_boost_internal)
-    list(APPEND CPPREST_TARGETS cpprestsdk_boost_internal)
+    list(APPEND CPPREST_TARGETS ${cpprestsdk_boost_internal})
     set(CPPREST_USES_BOOST ON)
   endif()
   if(TARGET cpprestsdk_zlib_internal)
-    list(APPEND CPPREST_TARGETS cpprestsdk_zlib_internal)
+    list(APPEND CPPREST_TARGETS ${cpprestsdk_zlib_internal})
     set(CPPREST_USES_ZLIB ON)
   endif()
   if(TARGET cpprestsdk_brotli_internal)
@@ -262,7 +257,7 @@ if(CPPREST_INSTALL)
     set(CPPREST_USES_BROTLI ON)
   endif()
   if(TARGET cpprestsdk_openssl_internal)
-    list(APPEND CPPREST_TARGETS cpprestsdk_openssl_internal)
+    list(APPEND CPPREST_TARGETS ${cpprestsdk_openssl_internal})
     set(CPPREST_USES_OPENSSL ON)
   endif()
   if(TARGET cpprestsdk_winhttppal_internal)
@@ -270,7 +265,7 @@ if(CPPREST_INSTALL)
     set(CPPREST_USES_WINHTTPPAL ON)
   endif()
   if(TARGET cpprestsdk_websocketpp_internal)
-    list(APPEND CPPREST_TARGETS cpprestsdk_websocketpp_internal)
+    list(APPEND CPPREST_TARGETS ${cpprestsdk_websocketpp_internal})
   endif()
   install(
     TARGETS ${CPPREST_TARGETS}

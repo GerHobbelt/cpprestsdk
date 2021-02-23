@@ -4,7 +4,7 @@ if(WIN32)
   add_definitions(-DCOMMONUTILITIES_EXPORTS)
 endif()
 
-add_library(common_utilities
+add_library(common_utilities STATIC
   os_utilities.cpp
   )
 

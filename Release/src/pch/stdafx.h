@@ -47,8 +47,8 @@
 #include "pthread.h"
 #include <atomic>
 #include <cstdint>
-#include <signal.h>
-#include <stdint.h>
+#include <csignal>
+#include <cstdint>
 #include <string>
 #if (defined(ANDROID) || defined(__ANDROID__)) && !defined(_LIBCPP_VERSION)
 // Boost doesn't recognize libstdcpp on top of clang correctly
@@ -76,12 +76,12 @@
 #include "pplx/pplxtasks.h"
 #include <algorithm>
 #include <array>
-#include <assert.h>
+#include <cassert>
 #include <atomic>
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 
 // json

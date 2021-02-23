@@ -36,6 +36,6 @@ endif()
 configure_pch(httpclient_test stdafx.h stdafx.cpp)
 
 if(NOT WIN32)
-  cpprest_find_boost()
-  target_link_libraries(httpclient_test PRIVATE cpprestsdk_boost_internal)
+
+  target_link_libraries(httpclient_test PRIVATE ${cpprestsdk_boost_internal})
 endif()

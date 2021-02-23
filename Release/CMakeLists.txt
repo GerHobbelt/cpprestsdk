@@ -59,11 +59,25 @@ else()
   set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "Link against boost statically.")
 endif()
 
-include(cmake/cpprest_find_boost.cmake)
-include(cmake/cpprest_find_zlib.cmake)
+# ----------------------
+hunter_add_package(Boost COMPONENTS system random thread filesystem chrono atomic date_time regex)
+hunter_add_package(websocketpp)
+hunter_add_package(OpenSSL)
+hunter_add_package(ZLIB)
+
+find_package(Boost CONFIG REQUIRED system random thread filesystem chrono atomic date_time regex)
+find_package(websocketpp CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(ZLIB CONFIG REQUIRED)
+
+set(cpprestsdk_boost_internal Boost::system Boost::random Boost::thread Boost::filesystem Boost::chrono Boost::atomic
+        Boost::date_time Boost::regex Boost::boost)
+set(cpprestsdk_websocketpp_internal websocketpp::websocketpp)
+set(cpprestsdk_openssl_internal OpenSSL::SSL OpenSSL::Crypto)
+set(cpprestsdk_zlib_internal ZLIB::zlib)
+# -----------------------
+
 include(cmake/cpprest_find_winhttppal.cmake)
-include(cmake/cpprest_find_openssl.cmake)
-include(cmake/cpprest_find_websocketpp.cmake)
 include(cmake/cpprest_find_brotli.cmake)
 include(CheckIncludeFiles)
 include(GNUInstallDirs)
@@ -233,6 +247,8 @@ get_directory_property(PARENT_DIR PARENT_DIRECTORY)
 if(NOT PARENT_DIR STREQUAL "")
   set(Casablanca_LIBRARIES ${Casablanca_LIBRARIES} PARENT_SCOPE)
 endif()
+
+set(TEST_LIBRARY_TARGET_TYPE STATIC)
 
 # Finally, the tests all use the same style declaration to build themselves, so we use a function
 function(add_casablanca_test NAME SOURCES_VAR)

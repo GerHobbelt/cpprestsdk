@@ -5,7 +5,7 @@ set(SOURCES
   test_server_utilities.cpp
 )
 
-add_library(httptest_utilities ${SOURCES})
+add_library(httptest_utilities STATIC ${SOURCES})
 if(WIN32)
   target_compile_definitions(httptest_utilities PRIVATE -DHTTPTESTUTILITY_EXPORTS)
 endif()

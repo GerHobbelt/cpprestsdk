@@ -12,6 +12,6 @@ endif()
 
 add_casablanca_test(json_test SOURCES)
 if(UNIX AND NOT APPLE)
-  cpprest_find_boost()
-  target_link_libraries(json_test PRIVATE cpprestsdk_boost_internal)
+
+  target_link_libraries(json_test PRIVATE ${cpprestsdk_boost_internal})
 endif()
