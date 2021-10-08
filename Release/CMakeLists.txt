@@ -11,7 +11,7 @@ endif()
 
 set(CPPREST_VERSION_MAJOR 2)
 set(CPPREST_VERSION_MINOR 10)
-set(CPPREST_VERSION_REVISION 6)
+set(CPPREST_VERSION_REVISION 7)
 
 enable_testing()
 
@@ -113,7 +113,7 @@ else()
 endif()
 
 set(WARNINGS)
-set(ANDROID_STL_FLAGS)
+set(ANDROID_LIBS)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
@@ -122,27 +122,8 @@ if(IOS)
   # The cxx_flags must be reset here, because the ios-cmake toolchain file unfortunately sets "-headerpad_max_install_names" which is not a valid clang flag.
   set(CMAKE_CXX_FLAGS "-fvisibility=hidden")
 elseif(ANDROID)
-  if(ARM)
-    set(LIBCXX_STL "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/thumb/libgnustl_static.a")
-  else()
-    set(LIBCXX_STL "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/libgnustl_static.a")
-  endif()
   # These are used in the shared library case
-  set(ANDROID_STL_FLAGS
-    ${LIBCXX_STL}
-    atomic
-    dl
-    gcc
-    c
-    m
-    -nodefaultlibs
-    )
-
-  include_directories(SYSTEM
-    "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/4.8/include"
-    "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include"
-    "${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/4.8/include/backward"
-    )
+  set(ANDROID_LIBS atomic dl)
 elseif(UNIX) # This includes OSX
 elseif(WIN32)
   add_definitions(-DUNICODE -D_UNICODE -DWIN32 -D_SCL_SECURE_NO_WARNINGS)
@@ -167,16 +148,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR IOS)
   message("-- Setting clang options")
 
   if(ANDROID)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes -Wno-pointer-arith")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-pedantic -Wno-attributes -Wno-pointer-arith")
   elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(WARNINGS -Wall -Wextra -Wcast-qual -Wconversion -Wformat=2 -Winit-self -Winvalid-pch -Wmissing-format-attribute -Wmissing-include-dirs -Wpacked -Wredundant-decls)
-    set(LINUX_SUPPRESSIONS -Wno-overloaded-virtual -Wno-sign-conversion -Wno-deprecated -Wno-unknown-pragmas -Wno-reorder -Wno-char-subscripts -Wno-switch -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated -Wno-unused-value -Wno-unknown-warning-option -Wno-return-type-c-linkage -Wno-unused-function -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-unused-local-typedefs -Wno-delete-non-virtual-dtor -Wno-unused-lambda-capture)
+    set(LINUX_SUPPRESSIONS -Wno-overloaded-virtual -Wno-sign-conversion -Wno-deprecated -Wno-unknown-pragmas -Wno-reorder -Wno-char-subscripts -Wno-switch -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated -Wno-unused-value -Wno-unknown-warning-option -Wno-return-type-c-linkage -Wno-unused-function -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-unused-local-typedefs)
     set(WARNINGS ${WARNINGS} ${LINUX_SUPPRESSIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-return-type-c-linkage -Wno-unneeded-internal-declaration")
   else()
     set(WARNINGS -Wall -Wextra -Wcast-qual -Wconversion -Wformat=2 -Winit-self -Winvalid-pch -Wmissing-format-attribute -Wmissing-include-dirs -Wpacked -Wredundant-decls)
-    set(OSX_SUPPRESSIONS -Wno-overloaded-virtual -Wno-sign-conversion -Wno-deprecated -Wno-unknown-pragmas -Wno-reorder -Wno-char-subscripts -Wno-switch -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated -Wno-unused-value -Wno-unknown-warning-option -Wno-return-type-c-linkage -Wno-unused-function -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-unused-local-typedefs -Wno-delete-non-virtual-dtor -Wno-unused-lambda-capture)
+    set(OSX_SUPPRESSIONS -Wno-overloaded-virtual -Wno-sign-conversion -Wno-deprecated -Wno-unknown-pragmas -Wno-reorder -Wno-char-subscripts -Wno-switch -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated -Wno-unused-value -Wno-unknown-warning-option -Wno-return-type-c-linkage -Wno-unused-function -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-unused-local-typedefs)
     set(WARNINGS ${WARNINGS} ${OSX_SUPPRESSIONS})
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wno-return-type-c-linkage -Wno-unneeded-internal-declaration")
@@ -190,10 +170,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   message("-- Setting gcc options")
 
   set(WARNINGS -Wall -Wextra -Wunused-parameter -Wcast-align -Wcast-qual -Wconversion -Wformat=2 -Winit-self -Winvalid-pch -Wmissing-format-attribute -Wmissing-include-dirs -Wpacked -Wredundant-decls -Wunreachable-code)
-  if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0")
-    set(WARNINGS ${WARNINGS} -Wno-format-truncation)
-  endif()
-
   set(LD_FLAGS "${LD_FLAGS} -Wl,-z,defs")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-strict-aliasing")
@@ -247,7 +223,7 @@ function(add_casablanca_test NAME SOURCES_VAR)
       cpprest
       common_utilities
       unittestpp
-      ${ANDROID_STL_FLAGS}
+      ${ANDROID_LIBS}
     )
     if (BUILD_SHARED_LIBS)
       add_test(NAME ${NAME}

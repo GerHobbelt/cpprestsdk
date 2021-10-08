@@ -432,7 +432,7 @@ protected:
     /// By default this is an invalid stream. The user could set the instream on
     /// a request by calling set_request_stream(...). This would also be set when
     /// set_body() is called - a stream from the body is constructed and set.
-    /// Even in the presense of msg body this stream could be invalid. An example
+    /// Even in the presence of msg body this stream could be invalid. An example
     /// would be when the user sets an ostream for the response. With that API the
     /// user does not provide the ability to read the msg body.
     /// Thus m_instream is valid when there is a msg body and it can actually be read
@@ -878,6 +878,9 @@ private:
     http::method m_method;
 
     // Tracks whether or not a response has already been started for this message.
+    // 0 = No reply sent
+    // 1 = Usual reply sent
+    // 2 = Reply aborted by another thread; e.g. server shutdown
     pplx::details::atomic_long m_initiated_response;
 
     std::unique_ptr<http::details::_http_server_context> m_server_context;

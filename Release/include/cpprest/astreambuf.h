@@ -13,10 +13,11 @@
 ****/
 #pragma once
 
+#include <math.h>
+#include <atomic>
+#include <cstring>
 #include <ios>
 #include <memory>
-#include <cstring>
-#include <math.h>
 
 #include "pplx/pplxtasks.h"
 #include "cpprest/details/basic_types.h"
@@ -342,7 +343,7 @@ namespace streams
         /// Gets a pointer to the next already allocated contiguous block of data.
         /// </summary>
         /// <param name="ptr">A reference to a pointer variable that will hold the address of the block on success.</param>
-        /// <param name="count">The number of contiguous characters available at the address in 'ptr.'</param>
+        /// <param name="count">The number of contiguous characters available at the address in 'ptr'.</param>
         /// <returns><c>true</c> if the operation succeeded, <c>false</c> otherwise.</returns>
         /// <remarks>
         /// A return of false does not necessarily indicate that a subsequent read operation would fail, only that
@@ -745,7 +746,10 @@ namespace streams
 
         std::exception_ptr m_currentException;
         // The in/out mode for the buffer
-        bool m_stream_can_read, m_stream_can_write, m_stream_read_eof, m_alloced;
+        std::atomic<bool> m_stream_can_read;
+        std::atomic<bool> m_stream_can_write;
+        std::atomic<bool> m_stream_read_eof;
+        std::atomic<bool> m_alloced;
 
 
     private:
@@ -1016,7 +1020,7 @@ namespace streams
         /// Gets a pointer to the next already allocated contiguous block of data.
         /// </summary>
         /// <param name="ptr">A reference to a pointer variable that will hold the address of the block on success.</param>
-        /// <param name="count">The number of contiguous characters available at the address in 'ptr.'</param>
+        /// <param name="count">The number of contiguous characters available at the address in 'ptr'.</param>
         /// <returns><c>true</c> if the operation succeeded, <c>false</c> otherwise.</returns>
         /// <remarks>
         /// A return of false does not necessarily indicate that a subsequent read operation would fail, only that
@@ -1208,5 +1212,3 @@ namespace streams
     };
 
 }}
-
-
