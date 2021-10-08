@@ -25,6 +25,17 @@ namespace
 // This pointer will be 0-initialized by default (at load time).
 std::atomic<JavaVM*> JVM;
 
+static void abort_if_no_jvm()
+{
+    if (JVM == nullptr)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, "CPPRESTSDK", "%s",
+            "The CppREST SDK must be initialized before first use on android: "
+            "https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Android");
+        std::abort();
+    }
+}
+
 JNIEnv* get_jvm_env()
 {
     abort_if_no_jvm();
@@ -36,17 +47,6 @@ JNIEnv* get_jvm_env()
     }
 
     return env;
-}
-
-static void abort_if_no_jvm()
-{
-    if (JVM == nullptr)
-    {
-        __android_log_print(ANDROID_LOG_ERROR, "CPPRESTSDK", "%s",
-            "The CppREST SDK must be initialized before first use on android: "
-            "https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Android");
-        std::abort();
-    }
 }
 #endif // __ANDROID__
 
@@ -110,7 +110,7 @@ private:
 #if defined(_WIN32)
 struct shared_threadpool
 {
-    typename std::aligned_union<0, threadpool_impl>::type shared_storage;
+    std::aligned_union<0, threadpool_impl>::type shared_storage;
 
     threadpool_impl& get_shared()
     {

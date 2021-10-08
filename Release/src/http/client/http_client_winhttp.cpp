@@ -302,6 +302,36 @@ public:
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        compression_state(const compression_state&) = delete;
+        compression_state(compression_state&& other)
+            : m_buffer(std::move(other.m_buffer))
+            , m_acquired(other.m_acquired)
+            , m_bytes_read(other.m_bytes_read)
+            , m_bytes_processed(other.m_bytes_processed)
+            , m_needs_flush(other.m_needs_flush)
+            , m_started(other.m_started)
+            , m_done(other.m_done)
+            , m_chunked(other.m_chunked)
+            , m_chunk_bytes(other.m_chunk_bytes)
+            , m_chunk(std::move(other.m_chunk))
+        {}
+        compression_state& operator=(const compression_state&) = delete;
+        compression_state& operator=(compression_state&& other) {
+            m_buffer = std::move(other.m_buffer);
+            m_acquired = other.m_acquired;
+            m_bytes_read = other.m_bytes_read;
+            m_bytes_processed = other.m_bytes_processed;
+            m_needs_flush = other.m_needs_flush;
+            m_started = other.m_started;
+            m_done = other.m_done;
+            m_chunked = other.m_chunked;
+            m_chunk_bytes = other.m_chunk_bytes;
+            m_chunk = std::move(other.m_chunk);
+            return *this;
+        }
+#endif // defined(_MSC_VER) && _MSC_VER < 1900
+
         // Minimal state for on-the-fly decoding of "chunked" encoded data
         class _chunk_helper
         {
@@ -425,12 +455,12 @@ public:
                         }
                         else if (buffer[n] == '\r')
                         {
-                            // We've reached the end of the size, and there's no chunk extention
+                            // We've reached the end of the size, and there's no chunk extension
                             m_expect_linefeed = true;
                         }
                         else if (buffer[n] == ';')
                         {
-                            // We've reached the end of the size, and there's a chunk extention;
+                            // We've reached the end of the size, and there's a chunk extension;
                             // we don't support extensions, so we ignore them per RFC
                             m_ignore = true;
                         }
@@ -1288,7 +1318,7 @@ private:
     {
         const bool defaultChunkSize = pContext->m_http_client->client_config().is_default_chunksize();
 
-        // If user specified a chunk size then read in chunks instead of using query data avaliable.
+        // If user specified a chunk size then read in chunks instead of using query data available.
         if (defaultChunkSize)
         {
             if (!WinHttpQueryDataAvailable(pContext->m_request_handle, nullptr))
@@ -2263,7 +2293,7 @@ private:
                         return true;
                     };
 
-                    Concurrency::details::_do_while([p_request_context, chunk_size, process_buffer]() -> pplx::task<bool>
+                    pplx::details::_do_while([p_request_context, chunk_size, process_buffer]() -> pplx::task<bool>
                     {
                         uint8_t *buffer;
 
