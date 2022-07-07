@@ -8,6 +8,7 @@ if(UNIX)
 else()
   project(cpprestsdk CXX)
 endif()
+find_package(OpenSSL REQUIRED)
 
 set(CPPREST_VERSION_MAJOR 2)
 set(CPPREST_VERSION_MINOR 10)
