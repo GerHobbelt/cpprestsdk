@@ -34,7 +34,7 @@ function(cpprest_find_openssl)
     if(APPLE)
       if(NOT DEFINED OPENSSL_ROOT_DIR)
         # Prefer a homebrew version of OpenSSL over the one in /usr/lib
-        file(GLOB OPENSSL_ROOT_DIR /usr/local/Cellar/openssl*/*)
+        file(GLOB OPENSSL_ROOT_DIR /opt/homebrew/Cellar/openssl*/*)
         # Prefer the latest (make the latest one first)
         list(REVERSE OPENSSL_ROOT_DIR)
         list(GET OPENSSL_ROOT_DIR 0 OPENSSL_ROOT_DIR)
