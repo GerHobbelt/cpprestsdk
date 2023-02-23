@@ -27,7 +27,7 @@
 #endif // _DEBUG
 
 #include <SDKDDKVer.h>
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+//#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 
 #if CPPREST_TARGET_XP && _WIN32_WINNT != 0x0501
 #error CPPREST_TARGET_XP implies _WIN32_WINNT == 0x0501
