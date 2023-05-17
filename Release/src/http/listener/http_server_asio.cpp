@@ -514,9 +514,12 @@ void hostport_listener::start()
     auto& service = crossplat::threadpool::shared_instance().service();
     tcp::resolver resolver(service);
     // #446: boost resolver does not recognize "+" as a host wildchar
+
+    // Merge release 1.14 change #1145
+    // Allow server to work on loopback address overriding default asio address_configured flag
     tcp::resolver::query query = ( "+" == m_host)?
-          tcp::resolver::query(m_port):
-          tcp::resolver::query(m_host, m_port);
+      tcp::resolver::query(m_port, boost::asio::ip::resolver_query_base::flags()):
+      tcp::resolver::query(m_host, m_port, boost::asio::ip::resolver_query_base::flags());
 
     tcp::endpoint endpoint = *resolver.resolve(query);
 

@@ -582,7 +582,8 @@ public:
 
             m_context->m_timer.start();
 
-            tcp::resolver::query query(utility::conversions::to_utf8string(proxy_host), to_string(proxy_port));
+            // Allow client to work on loopback address overriding default asio address_configured flag
+            tcp::resolver::query query(utility::conversions::to_utf8string(proxy_host), to_string(proxy_port), boost::asio::ip::resolver_query_base::flags());
 
             auto client = std::static_pointer_cast<asio_client>(m_context->m_http_client);
             client->m_resolver.async_resolve(query,
@@ -869,7 +870,8 @@ public:
                 auto tcp_host = proxy_type == http_proxy_type::http ? proxy_host : host;
                 auto tcp_port = proxy_type == http_proxy_type::http ? proxy_port : port;
 
-                tcp::resolver::query query(tcp_host, to_string(tcp_port));
+                // Allow client to work on loopback address overriding default asio address_configured flag
+                tcp::resolver::query query(tcp_host, to_string(tcp_port), boost::asio::ip::resolver_query_base::flags());
                 auto client = std::static_pointer_cast<asio_client>(ctx->m_http_client);
                 client->m_resolver.async_resolve(query,
                                                  boost::bind(&asio_context::handle_resolve,
