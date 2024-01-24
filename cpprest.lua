@@ -17,7 +17,7 @@ includedirs {
   "Release/src/pch",
   "Release/include",
   _3RDPARTY_DIR .. "/boost",
-  _3RDPARTY_DIR .. "/zlib",
+  _3RDPARTY_DIR .. "/zlib-ng",
 }
 
 files {
