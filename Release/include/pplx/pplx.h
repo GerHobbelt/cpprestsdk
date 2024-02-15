@@ -143,8 +143,8 @@ public:
         }
         else
         {
-            _M_pScheduler->schedule(_TaskProcHandle_t::_RunChoreBridge, _PTaskHandle);
             _M_scheduled_task.store(_PTaskHandle);
+            _M_pScheduler->schedule(_TaskProcHandle_t::_RunChoreBridge, _PTaskHandle);
         }
     }
 
