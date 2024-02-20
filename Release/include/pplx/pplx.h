@@ -143,6 +143,9 @@ public:
         }
         else
         {
+            // Store the task first before scheduling, otherwise a potential race condition
+            // could occur between storing _M_scheduled_task here and _M_scheduled_task being
+            // set to nullptr in _Complete(). 
             _M_scheduled_task.store(_PTaskHandle);
             _M_pScheduler->schedule(_TaskProcHandle_t::_RunChoreBridge, _PTaskHandle);
         }
