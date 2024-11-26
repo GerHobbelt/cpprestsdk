@@ -17,6 +17,7 @@
 
 #include "cpprest/astreambuf.h"
 #include <iosfwd>
+#include <cstdio>
 
 namespace Concurrency
 {
@@ -71,18 +72,124 @@ struct Value2StringFormatter
     }
 };
 
+template <class TChar>
+struct custom_char_traits
+{
+  using char_type = TChar;
+  using int_type = int;
+  using off_type = std::streamoff;
+  using pos_type = std::streampos;
+  using state_type = mbstate_t;
+
+  static inline void constexpr assign(char_type& c1, const char_type& c2) noexcept
+  {
+    c1 = c2;
+  }
+  static inline constexpr bool eq(char_type c1, char_type c2) noexcept
+  {
+    return c1 == c2;
+  }
+  static inline constexpr bool lt(char_type c1, char_type c2) noexcept
+  {
+    return c1 < c2;
+  }
+
+  static constexpr int compare(const char_type* s1, const char_type* s2, size_t n)
+  {
+    for (; n; --n, ++s1, ++s2)
+    {
+      if (lt(*s1, *s2))
+        return -1;
+      if (lt(*s2, *s1))
+        return 1;
+    }
+    return 0;
+  }
+  static constexpr size_t length(const char_type* s)
+  {
+    size_t len = 0;
+    for (; !eq(*s, char_type(0)); ++s)
+      ++len;
+    return len;
+  }
+  static constexpr const char_type* find(const char_type* s, size_t n, const char_type& a)
+  {
+    for (; n; --n)
+    {
+      if (eq(*s, a))
+        return s;
+      ++s;
+    }
+    return nullptr;
+  }
+  static constexpr char_type* move(char_type* s1, const char_type* s2, size_t n)
+  {
+    if (n == 0)
+      return s1;
+    char_type* r = s1;
+    if (s1 < s2)
+    {
+      for (; n; --n, ++s1, ++s2)
+        assign(*s1, *s2);
+    }
+    else if (s2 < s1)
+    {
+      s1 += n;
+      s2 += n;
+      for (; n; --n)
+        assign(*--s1, *--s2);
+    }
+    return r;
+  }
+  static constexpr char_type* copy(char_type* s1, const char_type* s2, size_t n)
+  {
+    char_type* r = s1;
+    for (; n; --n, ++s1, ++s2)
+      assign(*s1, *s2);
+    return r;
+  }
+  static constexpr char_type *
+  assign(char_type *s, size_t n, char_type a) {
+    char_type* r = s;
+    for (; n; --n, ++s)
+      assign(*s, a);
+    return r;
+  }
+
+  static inline constexpr int_type not_eof(int_type c) noexcept
+  {
+    return eq_int_type(c, eof()) ? ~eof() : c;
+  }
+  static inline constexpr char_type to_char_type(int_type c) noexcept
+  {
+    return char_type(c);
+  }
+  static inline constexpr int_type to_int_type(char_type c) noexcept
+  {
+    return int_type(c);
+  }
+  static inline constexpr bool eq_int_type(int_type c1, int_type c2) noexcept
+  {
+    return c1 == c2;
+  }
+  static inline constexpr int_type eof() noexcept
+  {
+    return int_type(EOF);
+  }
+};
+
 template<>
 struct Value2StringFormatter<uint8_t>
 {
     template<typename T>
-    static std::basic_string<uint8_t> format(const T& val)
+    static std::basic_string<uint8_t, custom_char_traits<uint8_t>> format(const T& val)
     {
         std::basic_ostringstream<char> ss;
         ss << val;
         return reinterpret_cast<const uint8_t*>(ss.str().c_str());
     }
 
-    static std::basic_string<uint8_t> format(const utf16string& val)
+    static std::basic_string<uint8_t, custom_char_traits<uint8_t>> format(const utf16string& val)
     {
         return format(utility::conversions::utf16_to_utf8(val));
     }
