@@ -305,11 +305,11 @@ protected:
             _M_last = node;
         }
 
-        void remove(_CancellationTokenRegistration* token)
+        [[nodiscard]] bool remove(_CancellationTokenRegistration* token)
         {
             Node* node = _M_begin;
             Node* prev = nullptr;
-
+            bool freed{false};
             while (node != nullptr)
             {
                 if (node->_M_token == token)
@@ -329,12 +329,14 @@ protected:
                     }
 
                     ::free(node);
+                    freed = true;
                     break;
                 }
 
                 prev = node;
                 node = node->_M_next;
             }
+            return freed;
         }
 
     private:
@@ -442,9 +444,11 @@ public:
             //
             if (!_M_registrations.empty())
             {
-                _M_registrations.remove(_PRegistration);
-                _PRegistration->_M_state = _CancellationTokenRegistration::_STATE_SYNCHRONIZE;
-                _PRegistration->_Release();
+                if (_M_registrations.remove(_PRegistration))
+                {
+                  _PRegistration->_M_state = _CancellationTokenRegistration::_STATE_SYNCHRONIZE;
+                  _PRegistration->_Release();
+                }
             }
             else
             {
